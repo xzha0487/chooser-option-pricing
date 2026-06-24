@@ -1,4 +1,3 @@
-
 import yfinance as yf
 import pandas as pd
 import numpy as np
@@ -6,9 +5,9 @@ from fredapi import Fred
 
 START = "2018-01-01"
 END = "2024-12-31"
-fred = Fred(api_key="793ea442d5187f9e5b7b0c30de96367a")
+fred = Fred(api_key="ä½ çš„FRED_KEYå¡«è¿™é‡Œ")
 
-# ÏÂÔØÊý¾Ý
+# Download data
 jpm = yf.download("JPM", start=START, end=END)
 jpm.columns = [c[0] for c in jpm.columns]
 
@@ -17,7 +16,7 @@ vix.columns = [c[0] for c in vix.columns]
 
 treasury_series = {
     "DGS3MO": "Yield_3M",
-    "DGS1": "Yield_1Y", 
+    "DGS1": "Yield_1Y",
     "DGS2": "Yield_2Y",
     "DGS10": "Yield_10Y"
 }
@@ -26,7 +25,7 @@ for code, name in treasury_series.items():
     s = fred.get_series(code, observation_start=START, observation_end=END)
     treasury[name] = s
 
-# ºÏ²¢
+# Merge
 jpm_close = jpm[["Close"]].copy()
 jpm_close.columns = ["JPM_Close"]
 jpm_close.index = pd.to_datetime(jpm_close.index)
@@ -41,7 +40,7 @@ master = jpm_close.join(vix_close, how="left")
 master = master.join(treasury, how="left")
 master = master.ffill().dropna()
 
-# ÌØÕ÷¹¤³Ì
+# Feature engineering
 df = master.copy()
 df["Log_Return"] = np.log(df["JPM_Close"] / df["JPM_Close"].shift(1))
 df["RealVol_10d"] = df["Log_Return"].rolling(10).std() * np.sqrt(252)
@@ -59,6 +58,11 @@ df["Yield_Spread"] = df["Yield_10Y"] - df["Yield_2Y"]
 df["VIX_JPM_Corr"] = df["VIX_Close"].rolling(30).corr(df["JPM_Close"])
 df = df.dropna()
 
-# ±£´æ
+# Save
 df.to_csv("data/processed/featured_dataset.csv")
-print(f"Êý¾Ý¸üÐÂÍê³É£º{df.shape[0]} row ¡Á {df.shape[1]} column")
+print(f"Data updated: {df.shape[0]} rows x {df.shape[1]} columns")
+'''
+
+with open("data_collector.py", "w", encoding="utf-8") as f:
+    f.write(script)
+print("data_collector.py generated")
