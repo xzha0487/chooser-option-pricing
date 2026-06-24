@@ -5,7 +5,7 @@ from fredapi import Fred
 
 START = "2018-01-01"
 END = "2024-12-31"
-fred = Fred(api_key="你的FRED_KEY填这里")
+fred = Fred(api_key="793ea442d5187f9e5b7b0c30de96367a")
 
 # Download data
 jpm = yf.download("JPM", start=START, end=END)
@@ -61,8 +61,4 @@ df = df.dropna()
 # Save
 df.to_csv("data/processed/featured_dataset.csv")
 print(f"Data updated: {df.shape[0]} rows x {df.shape[1]} columns")
-'''
 
-with open("data_collector.py", "w", encoding="utf-8") as f:
-    f.write(script)
-print("data_collector.py generated")
