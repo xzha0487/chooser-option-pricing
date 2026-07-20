@@ -1,55 +1,96 @@
+import pickle
+from pathlib import Path
 
-import streamlit as st
 import numpy as np
 import pandas as pd
-from scipy.stats import norm
-import matplotlib.pyplot as plt
-import pickle
-import shap
-import warnings
-warnings.filterwarnings("ignore")
+import streamlit as st
+
 
 # ============================================================
-# Page Config
+# Project paths
+# app.py location:
+# chooser-option-pricing/app/app.py
 # ============================================================
-st.set_page_config(
-    page_title="Chooser Option Pricing Tool",
-    page_icon="📈",
-    layout="wide"
-)
+
+PROJECT_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = PROJECT_DIR / "data"
+MODEL_DIR = PROJECT_DIR / "models"
+
 
 # ============================================================
-# Load Models & Data
+# Load models
 # ============================================================
+
 @st.cache_resource
 def load_models():
-    with open("models/best_gbdt.pkl", "rb") as f:
+    gbdt_path = MODEL_DIR / "best_gbdt.pkl"
+    scaler_path = MODEL_DIR / "scaler.pkl"
+
+    if not gbdt_path.exists():
+        raise FileNotFoundError(f"Model file not found: {gbdt_path}")
+
+    if not scaler_path.exists():
+        raise FileNotFoundError(f"Scaler file not found: {scaler_path}")
+
+    with open(gbdt_path, "rb") as f:
         gbdt = pickle.load(f)
-    with open("models/scaler.pkl", "rb") as f:
+
+    with open(scaler_path, "rb") as f:
         scaler = pickle.load(f)
+
     return gbdt, scaler
+
+
+# ============================================================
+# Load data
+# ============================================================
 
 @st.cache_data
 def load_data():
+    featured_path = DATA_DIR / "featured_dataset.csv"
+    results_path = DATA_DIR / "bsm_results.csv"
+
+    if not featured_path.exists():
+        raise FileNotFoundError(
+            f"Data file not found: {featured_path}"
+        )
+
+    if not results_path.exists():
+        raise FileNotFoundError(
+            f"Data file not found: {results_path}"
+        )
+
     df = pd.read_csv(
-        DATA_DIR / "featured_dataset.csv",
+        featured_path,
         index_col=0,
         parse_dates=True
     )
 
-    results = pd.read_csv(
-        DATA_DIR / "bsm_results.csv",
+    results_df = pd.read_csv(
+        results_path,
         index_col=0,
         parse_dates=True
     )
-    df["Sentiment_Score"] = 1 - (
-        df["VIX_Close"] - df["VIX_Close"].min()) / (
-        df["VIX_Close"].max() - df["VIX_Close"].min())
-    return df, results
+
+    vix_range = df["VIX_Close"].max() - df["VIX_Close"].min()
+
+    if vix_range == 0:
+        df["Sentiment_Score"] = 0.5
+    else:
+        df["Sentiment_Score"] = 1 - (
+            (df["VIX_Close"] - df["VIX_Close"].min())
+            / vix_range
+        )
+
+    return df, results_df
+
+
+# ============================================================
+# Run loading functions
+# ============================================================
 
 gbdt, scaler = load_models()
 df, results_df = load_data()
-
 # ============================================================
 # BSM Functions
 # ============================================================
