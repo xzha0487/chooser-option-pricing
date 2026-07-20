@@ -1,0 +1,5 @@
+,MAE,RMSE,R2
+BSM Baseline,0.0,0.0,1.0
+Approach1 (ML Vol+BSM),10.6596,13.4394,0.0623
+Best RF (Tuned),11.7256,14.0628,-0.0267
+Best GBDT (Tuned),9.7521,12.3548,0.2075
