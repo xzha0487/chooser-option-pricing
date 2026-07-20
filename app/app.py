@@ -31,12 +31,17 @@ def load_models():
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv("C:/Users/sasa0/Desktop/Chooser_option/data/featured_dataset.csv"
-        ,
-        index_col=0, parse_dates=True)
+    df = pd.read_csv(
+        DATA_DIR / "featured_dataset.csv",
+        index_col=0,
+        parse_dates=True
+    )
+
     results = pd.read_csv(
-        "C:/Users/sasa0/Desktop/Chooser_option/data/bsm_results.csv",
-        index_col=0, parse_dates=True)
+        DATA_DIR / "bsm_results.csv",
+        index_col=0,
+        parse_dates=True
+    )
     df["Sentiment_Score"] = 1 - (
         df["VIX_Close"] - df["VIX_Close"].min()) / (
         df["VIX_Close"].max() - df["VIX_Close"].min())
