@@ -4,7 +4,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import streamlit as st
-
+import matplotlib.pyplot as plt
+from scipy.stats import norm
 
 # ============================================================
 # Project paths
@@ -377,55 +378,132 @@ elif page == "📉 Dashboard":
     st.markdown("---")
 
     tab1, tab2, tab3 = st.tabs(
-        ["JPM Price", "VIX & Regime", "Chooser Price History"])
+        ["JPM Price", "VIX & Regime", "Chooser Price History"]
+    )
 
     with tab1:
         st.subheader("JPM Stock Price (2018-2024)")
+
         fig, ax = plt.subplots(figsize=(12, 5))
-        ax.plot(df.index, df["JPM_Close"],
-                color="steelblue", lw=1.2, label="JPM Close")
-        ma20 = df["JPM_Close"].rolling(20).mean()
-        ma60 = df["JPM_Close"].rolling(60).mean()
-        ax.plot(df.index, ma20, color="orange", lw=0.8,
-                ls="--", label="MA 20")
-        ax.plot(df.index, ma60, color="red", lw=0.8,
-                ls="--", label="MA 60")
+
+        ax.plot(
+            df.index,
+            df["JPM_Close"],
+            color="steelblue",
+            linewidth=1.2,
+            label="JPM Close"
+        )
+
+        ma20 = df["JPM_Close"].rolling(window=20).mean()
+        ma60 = df["JPM_Close"].rolling(window=60).mean()
+
+        ax.plot(
+            df.index,
+            ma20,
+            color="orange",
+            linewidth=0.8,
+            linestyle="--",
+            label="MA 20"
+        )
+
+        ax.plot(
+            df.index,
+            ma60,
+            color="red",
+            linewidth=0.8,
+            linestyle="--",
+            label="MA 60"
+        )
+
+        ax.set_xlabel("Date")
         ax.set_ylabel("Price ($)")
         ax.legend()
         ax.grid(True, alpha=0.3)
+
+        fig.tight_layout()
         st.pyplot(fig)
+        plt.close(fig)
 
     with tab2:
         st.subheader("VIX & Regime Classification")
+
         fig, ax = plt.subplots(figsize=(12, 5))
-        colors = {"Low": "green", "Medium": "orange", "High": "red"}
-        for regime, color in colors.items():
+
+        regime_colors = {
+            "Low": "green",
+            "Medium": "orange",
+            "High": "red"
+        }
+
+        for regime, color in regime_colors.items():
             mask = df["VIX_Regime"] == regime
-            ax.scatter(df[mask].index, df[mask]["VIX_Close"],
-                       color=color, alpha=0.6, s=5, label=regime)
-        ax.axhline(15.7, color="green", ls="--", lw=1,
-                   label="Low/Medium boundary (15.7)")
-        ax.axhline(21.1, color="red",   ls="--", lw=1,
-                   label="Medium/High boundary (21.1)")
+
+            ax.scatter(
+                df.loc[mask].index,
+                df.loc[mask, "VIX_Close"],
+                color=color,
+                alpha=0.6,
+                s=5,
+                label=regime
+            )
+
+        ax.axhline(
+            y=15.7,
+            color="green",
+            linestyle="--",
+            linewidth=1,
+            label="Low/Medium boundary (15.7)"
+        )
+
+        ax.axhline(
+            y=21.1,
+            color="red",
+            linestyle="--",
+            linewidth=1,
+            label="Medium/High boundary (21.1)"
+        )
+
+        ax.set_xlabel("Date")
         ax.set_ylabel("VIX Level")
         ax.legend()
         ax.grid(True, alpha=0.3)
+
+        fig.tight_layout()
         st.pyplot(fig)
+        plt.close(fig)
 
     with tab3:
         st.subheader("Historical Chooser Option Price")
+
         fig, ax = plt.subplots(figsize=(12, 5))
-        colors = {"Low": "green", "Medium": "orange", "High": "red"}
-        for regime, color in colors.items():
+
+        regime_colors = {
+            "Low": "green",
+            "Medium": "orange",
+            "High": "red"
+        }
+
+        for regime, color in regime_colors.items():
             mask = results_df["VIX_Regime"] == regime
-            ax.scatter(results_df[mask].index,
-                       results_df[mask]["Chooser_Price"],
-                       color=color, alpha=0.6, s=8, label=regime)
+
+            ax.scatter(
+                results_df.loc[mask].index,
+                results_df.loc[mask, "Chooser_Price"],
+                color=color,
+                alpha=0.6,
+                s=8,
+                label=regime
+            )
+
+        ax.set_xlabel("Date")
         ax.set_ylabel("Chooser Price ($)")
         ax.legend()
         ax.grid(True, alpha=0.3)
-        st.pyplot(fig)
 
+        fig.tight_layout()
+        st.pyplot(fig)
+        plt.close(fig)
+        
 # ============================================================
 # Page 5: Model Comparison
 # ============================================================
@@ -433,58 +511,123 @@ elif page == "🤖 Model Comparison":
     st.title("🤖 Model Performance Comparison")
     st.markdown("---")
 
-    # Performance metrics table
     st.subheader("Test Set Performance")
+
     metrics = pd.DataFrame({
-        "Model": ["BSM Baseline", "Approach1 (ML Vol+BSM)",
-                  "Best RF (Tuned)", "Best GBDT (Tuned)"],
-        "MAE ($)":  [0.0000, 10.6596, 11.7256, 9.7521],
-        "RMSE ($)": [0.0000, 13.4394, 14.0628, 12.3548],
-        "R²":       [1.0000,  0.0623, -0.0267,  0.2075],
+        "Model": [
+            "BSM Baseline",
+            "Approach1 (ML Vol+BSM)",
+            "Best RF (Tuned)",
+            "Best GBDT (Tuned)"
+        ],
+        "MAE ($)": [
+            0.0000,
+            10.6596,
+            11.7256,
+            9.7521
+        ],
+        "RMSE ($)": [
+            0.0000,
+            13.4394,
+            14.0628,
+            12.3548
+        ],
+        "R²": [
+            1.0000,
+            0.0623,
+            -0.0267,
+            0.2075
+        ],
     })
-    st.dataframe(metrics, use_container_width=True)
+
+    st.dataframe(
+        metrics,
+        use_container_width=True,
+        hide_index=True
+    )
 
     st.markdown("---")
 
     # SHAP feature importance
     st.subheader("SHAP Feature Importance")
+
     shap_data = {
-        "Feature": ["RealVol_30d", "JPM_Close", "Yield_3M", "Yield_2Y",
-                    "Yield_10Y", "VIX_JPM_Corr", "RealVol_60d",
-                    "Log_Return", "VIX_Close", "Sentiment_Score",
-                    "RealVol_10d", "Yield_Spread", "Rate_Momentum",
-                    "VIX_Regime_Code"],
-        "SHAP Importance": [5.787, 4.847, 0.305, 0.151, 0.112,
-                             0.099, 0.084, 0.073, 0.071, 0.054,
-                             0.044, 0.038, 0.015, 0.000],
+        "Feature": [
+            "RealVol_30d",
+            "JPM_Close",
+            "Yield_3M",
+            "Yield_2Y",
+            "Yield_10Y",
+            "VIX_JPM_Corr",
+            "RealVol_60d",
+            "Log_Return",
+            "VIX_Close",
+            "Sentiment_Score",
+            "RealVol_10d",
+            "Yield_Spread",
+            "Rate_Momentum",
+            "VIX_Regime_Code"
+        ],
+        "SHAP Importance": [
+            5.787,
+            4.847,
+            0.305,
+            0.151,
+            0.112,
+            0.099,
+            0.084,
+            0.073,
+            0.071,
+            0.054,
+            0.044,
+            0.038,
+            0.015,
+            0.000
+        ],
     }
+
     shap_df = pd.DataFrame(shap_data).sort_values(
-        "SHAP Importance", ascending=True)
+        by="SHAP Importance",
+        ascending=True
+    )
 
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.barh(shap_df["Feature"], shap_df["SHAP Importance"],
-            color="steelblue", alpha=0.8)
+
+    ax.barh(
+        shap_df["Feature"],
+        shap_df["SHAP Importance"],
+        color="steelblue",
+        alpha=0.8
+    )
+
     ax.set_xlabel("Mean |SHAP Value|")
+    ax.set_ylabel("Feature")
     ax.set_title("Feature Importance (SHAP)")
-    ax.grid(True, alpha=0.3)
+    ax.grid(axis="x", alpha=0.3)
+
+    fig.tight_layout()
     st.pyplot(fig)
+    plt.close(fig)
 
     st.markdown("---")
     st.subheader("Key Findings")
+
     col1, col2 = st.columns(2)
+
     with col1:
         st.markdown("""
         **BSM Limitations Found:**
-        - Volatility CV = 0.62 (BSM assumes 0)
-        - High vs Low regime price gap: 40.1%
-        - COVID crisis: 3x normal period pricing
-        - Static σ misses regime-dependent dynamics
+        - Volatility CV = 0.62, while standard BSM assumes constant volatility.
+        - The price gap between high- and low-volatility regimes is 40.1%.
+        - COVID-period prices were approximately three times normal-period prices.
+        - A static volatility input cannot capture regime-dependent market dynamics.
         """)
+
     with col2:
         st.markdown("""
         **ML Model Insights:**
-        - GBDT best performer (MAE=$9.75, R²=0.21)
-        - RealVol_30d dominant feature (SHAP=5.79)
-        - JPM_Close second most important (SHAP=4.85)
-        - Sentiment score limited contribution (SHAP=0.054)
+        - GBDT was the best ML performer, with MAE of $9.75 and R² of 0.21.
+        - RealVol_30d was the most influential feature, with SHAP importance of 5.79.
+        - JPM_Close was the second most influential feature, with SHAP importance of 4.85.
+        - Sentiment_Score made only a limited contribution, with SHAP importance of 0.054.
         """)
