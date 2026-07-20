@@ -23,9 +23,9 @@ st.set_page_config(
 # ============================================================
 @st.cache_resource
 def load_models():
-    with open(r"C:/Users/sasa0/Desktop/Chooser_option/week3/models/best_gbdt.pkl", "rb") as f:
+    with open("models/best_gbdt.pkl", "rb") as f:
         gbdt = pickle.load(f)
-    with open(r"C:/Users/sasa0/Desktop/Chooser_option/week3/models/scaler.pkl", "rb") as f:
+    with open("models/scaler.pkl", "rb") as f:
         scaler = pickle.load(f)
     return gbdt, scaler
 
