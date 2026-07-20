@@ -13,7 +13,7 @@ import streamlit as st
 # ============================================================
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = PROJECT_DIR / "data"
+DATA_DIR = PROJECT_DIR  / "data" / "processed"
 MODEL_DIR = PROJECT_DIR / "models"
 
 
