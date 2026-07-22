@@ -39,8 +39,8 @@ chooser-option-pricing/
 │
 ├── notebooks/
 │   ├── week1_data_collection.ipynb  # Data collection and feature engineering
-│   ├── week3_BSM_model.ipynb        # BSM model replication and analysis
-│   └── week5_ML_model.ipynb         # ML training, tuning, and SHAP analysis
+│   ├── week2.ipynb                  # BSM model
+│   └── week3&5.ipynb                # BSM model replication and analysis and ML training, tuning, and SHAP analysis
 │
 ├── app/
 │   └── app.py                       # Streamlit pricing application
