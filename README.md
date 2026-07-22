@@ -20,28 +20,36 @@ $$V_0 = C(S, K, T, r, \sigma) + P(S, Ke^{-r(T-t_c)}, t_c, r, \sigma)$$
 - Volatility (RealVol_30d) is the dominant pricing feature: **SHAP = 5.79**
 
 ## Project Structure
+```text
 chooser-option-pricing/
 ├── data/
-│   ├── raw/                    # Raw data (JPM, VIX, Treasury)
-│   └── processed/              # Cleaned dataset & BSM results
+│   ├── raw/                         # Raw data: JPM, VIX, and Treasury yields
+│   └── processed/                   # Cleaned features and BSM pricing results
 │       ├── featured_dataset.csv
 │       └── bsm_results.csv
+│
 ├── scripts/
-│   ├── data_collector.py       # Automated data collection
-│   └── bsm_pricing.py         # Automated BSM pricing
+│   ├── data_collector.py            # Automated market data collection
+│   └── bsm_pricing.py               # Automated BSM chooser option pricing
+│
 ├── models/
-│   ├── best_gbdt.pkl          # Best ML model (GBDT)
-│   ├── best_rf.pkl            # Random Forest model
-│   └── scaler.pkl             # Feature scaler
+│   ├── best_gbdt.pkl                # Tuned Gradient Boosting model
+│   ├── best_rf.pkl                  # Tuned Random Forest model
+│   └── scaler.pkl                   # Fitted feature scaler
+│
 ├── notebooks/
-│   ├── week1_data_collection.ipynb
-│   ├── week3_BSM_model.ipynb
-│   └── week5_ML_model.ipynb
+│   ├── week1_data_collection.ipynb  # Data collection and feature engineering
+│   ├── week3_BSM_model.ipynb        # BSM model replication and analysis
+│   └── week5_ML_model.ipynb         # ML training, tuning, and SHAP analysis
+│
 ├── app/
-│   └── app.py                 # Streamlit pricing tool
-├── reports/                   # Weekly reports
-├── requirements.txt
-└── README.md
+│   └── app.py                       # Streamlit pricing application
+│
+├── reports/                         # Weekly and final project reports
+│
+├── requirements.txt                 # Python dependencies
+└── README.md                        # Project documentation
+```
 
 ## Data Pipeline
 
